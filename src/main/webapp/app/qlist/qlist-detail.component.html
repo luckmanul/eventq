@@ -1,0 +1,43 @@
+
+<div *ngIf="question">
+    <h2><span jhiTranslate="eventqApp.question.detail.title">Question</span> {{question.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="eventqApp.question.title">Title</span></dt>
+        <dd>
+            <span>{{question.title}}</span>
+        </dd>
+        <dt><span jhiTranslate="eventqApp.question.description">Description</span></dt>
+        <dd>
+            <span>{{question.description}}</span>
+        </dd>
+        <!--<dt><span jhiTranslate="eventqApp.question.feedback">Feedback</span></dt>-->
+        <!--<dd>-->
+            <!--<span>{{question.feedback}}</span>-->
+        <!--</dd>-->
+        <dt><span jhiTranslate="eventqApp.question.createDate">Create Date</span></dt>
+        <dd>
+            <span>{{question.createDate | date:'medium'}}</span>
+        </dd>
+        <dt><span jhiTranslate="eventqApp.question.event">Event</span></dt>
+        <dd>
+            <div *ngIf="question.eventId">
+                <a [routerLink]="['/event', question.eventId]">{{question.eventId}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'question/'+ question.id + '/edit'} }]"
+            replaceUrl="true"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+    </button>
+</div>

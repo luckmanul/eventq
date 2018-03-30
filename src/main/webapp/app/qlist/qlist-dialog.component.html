@@ -1,0 +1,54 @@
+<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+
+    <div class="modal-header">
+        <h4 class="modal-title" id="myQuestionLabel" jhiTranslate="eventqApp.question.home.createOrEditLabel">Create or edit a Question</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                (click)="clear()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <!--<div class="form-group" [hidden]="!question.id">-->
+            <!--<label for="id" jhiTranslate="global.field.id">ID</label>-->
+            <!--<input type="text" class="form-control" id="id" name="id"-->
+                   <!--[(ngModel)]="question.id" readonly />-->
+        <!--</div>-->
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="eventqApp.question.title" for="field_title">Title</label>
+            <input type="text" class="form-control" name="title" id="field_title"
+                [(ngModel)]="question.title"  />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="eventqApp.question.description" for="field_description">Description</label>
+            <input type="text" class="form-control" name="description" id="field_description"
+                [(ngModel)]="question.description"  />
+        </div>
+        <!--<div class="form-group">-->
+            <!--<label class="form-control-label" jhiTranslate="eventqApp.question.feedback" for="field_feedback">Feedback</label>-->
+            <!--<input type="text" class="form-control" name="feedback" id="field_feedback"-->
+                <!--[(ngModel)]="question.feedback"  />-->
+        <!--</div>-->
+        <!--<div class="form-group">-->
+            <!--<label class="form-control-label" jhiTranslate="eventqApp.question.createDate" for="field_createDate">Create Date</label>-->
+            <!--<div class="d-flex">-->
+                <!--<input id="field_createDate" type="datetime-local" class="form-control" name="createDate" [(ngModel)]="question.createDate"-->
+                  <!--/>-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <!--<div class="form-group">-->
+            <!--<label jhiTranslate="eventqApp.question.event" for="field_event">Event</label>-->
+            <!--<select class="form-control" id="field_event" name="event" [(ngModel)]="question.eventId" >-->
+                <!--<option [ngValue]="null"></option>-->
+                <!--<option [ngValue]="eventOption.id" *ngFor="let eventOption of events; trackBy: trackEventById">{{eventOption.id}}</option>-->
+            <!--</select>-->
+        <!--</div>-->
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="clear()">
+            <span class="fa fa-ban"></span>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+            <span class="fa fa-save"></span>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

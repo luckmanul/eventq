@@ -1,0 +1,98 @@
+<div>
+
+    <jhi-alert></jhi-alert>
+    <!--<ng4-loading-spinner [threshold]="2000" [template]="template" [loadingText]="'Please wait...'" [zIndex]="9999"></ng4-loading-spinner>-->
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label class="form-control-label" for="event_id">Event ID</label>
+                <input type="text" class="form-control" name="event_id" id="event_id" [(ngModel)]="eventCode"  />
+            </div>
+        </div>
+        <div class="col-md-4" style="padding-top: 30px;">
+            <button class="btn btn-primary"  (click)="regEvent(eventCode)">
+                <span class="fa fa-plus"></span>
+                    <span>
+                    Register
+                    </span>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="showQuestion">
+        <h2>
+            <!--[routerLink]="['/', { outlets: { popup: 'question/'+ question.id + '/edit'} }]"-->
+            <!--<span jhiTranslate="eventqApp.question.home.title">Questions</span>-->
+            <button class="btn btn-primary float-left create-question" [routerLink]="['/', { outlets: { popup: 'qlist-new/' + event.id } }]">
+                <span class="fa fa-plus"></span>
+            <span  jhiTranslate="eventqApp.question.home.createLabel">
+            New Question
+            </span>
+            </button>
+        </h2>
+        <div class="row">
+        </div>
+        <br/>
+        <div class="table-responsive" *ngIf="questions">
+            <table class="table table-striped">
+                <thead>
+                <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+                    <!--<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>-->
+                    <th jhiSortBy="title"><span jhiTranslate="eventqApp.question.title">Title</span> <span class="fa fa-sort"></span></th>
+                    <th jhiSortBy="description"><span jhiTranslate="eventqApp.question.description">Description</span> <span class="fa fa-sort"></span></th>
+                    <!--<th jhiSortBy="feedback"><span jhiTranslate="eventqApp.question.feedback">Feedback</span> <span class="fa fa-sort"></span></th>-->
+                    <th jhiSortBy="createDate"><span jhiTranslate="eventqApp.question.createDate">Create Date</span> <span class="fa fa-sort"></span></th>
+                    <!--<th jhiSortBy="eventId"><span jhiTranslate="eventqApp.question.event">Event</span> <span class="fa fa-sort"></span></th>-->
+                    <th jhiSortBy="event.name"><span jhiTranslate="eventqApp.question.event">Event</span> <span class="fa fa-sort"></span></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
+                <tr *ngFor="let question of questions ;trackBy: trackId">
+                    <!--<td><a [routerLink]="['../qlist', question.id ]">{{question.id}}</a></td>-->
+                    <td>{{question.title}}</td>
+                    <td>{{question.description}}</td>
+                    <!--<td>{{question.feedback}}</td>-->
+                    <td>{{question.createDate | date:'medium'}}</td>
+                    <td>
+                        <div *ngIf="question.eventId">
+                            {{question.event.name}}
+                        </div>
+                    </td>
+                    <!--<td>-->
+                        <!--<div *ngIf="question.eventId">-->
+                            <!--<a [routerLink]="['../event', question.eventId  ]" >{{question.eventId}}</a>-->
+                        <!--</div>-->
+                    <!--</td>-->
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit"
+                                    [routerLink]="['../qlist', question.id ]"
+                                    class="btn btn-info btn-sm">
+                                <span class="fa fa-eye"></span>
+                                <span class="hidden-md-down" jhiTranslate="entity.action.view">View</span>
+                            </button>
+                            <!--<button type="submit"-->
+                            <!--[routerLink]="['/', { outlets: { popup: 'qlist/'+ question.id + '/edit'} }]"-->
+                            <!--replaceUrl="true"-->
+                            <!--class="btn btn-primary btn-sm">-->
+                            <!--<span class="fa fa-pencil"></span>-->
+                            <!--<span class="hidden-md-down" jhiTranslate="entity.action.edit">Edit</span>-->
+                            <!--</button>-->
+                            <!--<button type="submit"-->
+                            <!--[routerLink]="['/', { outlets: { popup: 'question/'+ question.id + '/delete'} }]"-->
+                            <!--replaceUrl="true"-->
+                            <!--class="btn btn-danger btn-sm">-->
+                            <!--<span class="fa fa-remove"></span>-->
+                            <!--<span class="hidden-md-down" jhiTranslate="entity.action.delete">Delete</span>-->
+                            <!--</button>-->
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
