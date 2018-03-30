@@ -11,6 +11,8 @@ import { PaginationConfig } from '../blocks/config/uib-pagination.config';
 import {EventService} from '../entities/event/event.service';
 import {DatePipe} from '@angular/common';
 import {isNullOrUndefined} from 'util';
+import {EventqWSService} from '../shared/eventqws/eventqws.service';
+import {Page} from './page.model';
 
 @Component({
     selector: 'jhi-qlist',
@@ -41,7 +43,8 @@ export class QListComponent implements OnInit, OnDestroy {
         private parseLinks: ParseLinks,
         private principal: Principal,
         private eventService: EventService,
-        private datePipe: DatePipe
+        private datePipe: DatePipe,
+        private eventqWsService: EventqWSService
     ) {
         this.showQuestion = false;
         this.loading = false;
@@ -75,10 +78,29 @@ export class QListComponent implements OnInit, OnDestroy {
                 .transform(event.createDate, 'yyyy-MM-ddThh:mm');
             this.event = event;
             this.reset();
+            this.subscribeWebSocket();
         }, (event) => {
             this.showQuestion = false;
             this.alertService.error('Event is not found');
         });
+    }
+
+    subscribeWebSocket() {
+        this.eventqWsService.subscribe();
+        this.eventqWsService.receive().subscribe(
+            (pageQuestion: Page<Question>) => {
+                console.log('message {}', pageQuestion);
+                this.page = 0;
+                this.questions = [];
+                this.links = '';
+                // this.links = this.parseLinks.parse(headers.get('link'));
+                this.totalItems = pageQuestion.totalElements;
+                for (let i = 0; i < pageQuestion.content.length; i++) {
+                    this.questions.push(pageQuestion.content[i]);
+                }
+                this.showQuestion = true;
+            }
+        );
     }
 
     reset() {
@@ -95,6 +117,7 @@ export class QListComponent implements OnInit, OnDestroy {
         if (!isNullOrUndefined(QListComponent.EVENTCODE)) {
             this.regEvent(QListComponent.EVENTCODE);
         }
+        this.eventqWsService.connect();
         // this.loadAll();
         // this.principal.identity().then((account) => {
         //     this.currentAccount = account;
@@ -104,13 +127,17 @@ export class QListComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
+        this.eventqWsService.unsubscribe();
     }
 
     trackId(index: number, item: Question) {
         return item.id;
     }
     registerChangeInQuestions() {
-        this.eventSubscriber = this.eventManager.subscribe('questionListModification', (response) => this.reset());
+        this.eventSubscriber = this.eventManager.subscribe('questionListModification', (response) => {
+            this.eventqWsService.sendEventqActivity(this.eventCode, this.page, this.itemsPerPage);
+            // this.reset()
+        });
     }
 
     sort() {
