@@ -7,6 +7,8 @@ import { Question } from './question.model';
 import { QuestionService } from './question.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
 import { PaginationConfig } from '../../blocks/config/uib-pagination.config';
+import {DatePipe} from '@angular/common';
+import {EventqWSService} from '../../shared/eventqws/eventqws.service';
 
 @Component({
     selector: 'jhi-question',
@@ -30,7 +32,9 @@ export class QuestionComponent implements OnInit, OnDestroy {
         private alertService: AlertService,
         private eventManager: EventManager,
         private parseLinks: ParseLinks,
-        private principal: Principal
+        private principal: Principal,
+        private datePipe: DatePipe,
+        private eventqWsService: EventqWSService
     ) {
         this.questions = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -69,6 +73,7 @@ export class QuestionComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         this.registerChangeInQuestions();
+        this.eventqWsService.connect();
     }
 
     ngOnDestroy() {
@@ -88,6 +93,28 @@ export class QuestionComponent implements OnInit, OnDestroy {
             result.push('id');
         }
         return result;
+    }
+
+    publish(question: Question) {
+        question.publish = true;
+        question.createDate = this.datePipe.transform(question.createDate, 'yyyy-MM-ddThh:mm');
+        this.save(question);
+    }
+
+    unpublish(question: Question) {
+        question.publish = false;
+        question.createDate = this.datePipe.transform(question.createDate, 'yyyy-MM-ddThh:mm');
+        this.save(question);
+    }
+
+    save(question: Question) {
+        this.questionService.update(question).subscribe(
+            (res: Question) => {
+                this.reset();
+                this.eventqWsService.sendEventqActivity(question.event.code, 0, 1000000);
+            }, (res: Response) => {
+                this.onError({ message: 'Update failed'});
+            });
     }
 
     private onSuccess(data, headers) {

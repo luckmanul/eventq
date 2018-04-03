@@ -16,25 +16,55 @@
         <table class="table table-striped">
             <thead>
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
-            <th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
+            <!--<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>-->
             <th jhiSortBy="title"><span jhiTranslate="eventqApp.question.title">Title</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="description"><span jhiTranslate="eventqApp.question.description">Description</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="feedback"><span jhiTranslate="eventqApp.question.feedback">Feedback</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="createDate"><span jhiTranslate="eventqApp.question.createDate">Create Date</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="publish"><span jhiTranslate="eventqApp.question.publish">Publish</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="eventId"><span jhiTranslate="eventqApp.question.event">Event</span> <span class="fa fa-sort"></span></th>
+            <th></th>
             <th></th>
             </tr>
             </thead>
             <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
             <tr *ngFor="let question of questions ;trackBy: trackId">
-                <td><a [routerLink]="['../question', question.id ]">{{question.id}}</a></td>
-                <td>{{question.title}}</td>
+                <!--<td><a [routerLink]="['../question', question.id ]">{{question.id}}</a></td>-->
+                <!--<td>{{question.title}}</td>-->
+                <td><a [routerLink]="['../question', question.id ]">{{question.title}}</a></td>
                 <td>{{question.description}}</td>
                 <td>{{question.feedback}}</td>
                 <td>{{question.createDate | date:'medium'}}</td>
+                <!--<td>{{question.publish}}</td>-->
+                <td class="text-center">
+                    <div *ngIf="!question.publish" >
+                        <button type="submit" class="btn btn-outline-secondary btn-sm" disabled="disabled">
+                            <span class="fa fa-times"></span>
+                        </button>
+                    </div>
+                    <div *ngIf="question.publish">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm" (click)="unpublish(question)" disabled="disabled">
+                            <span class="fa fa-check"></span>
+                        </button>
+                    </div>
+                </td>
                 <td>
                     <div *ngIf="question.eventId">
-                        <a [routerLink]="['../event', question.eventId  ]" >{{question.eventId}}</a>
+                        <a [routerLink]="['../event', question.eventId  ]" >{{question.event.code }}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container" *ngIf="!question.publish">
+                        <button type="submit" class="btn btn-primary btn-sm" (click)="publish(question)">
+                            <span class="fa fa-eye"></span>
+                            <span>publish</span>
+                        </button>
+                    </div>
+                    <div class="btn-group flex-btn-group-container" *ngIf="question.publish">
+                        <button type="submit" class="btn btn-primary btn-sm" (click)="unpublish(question)">
+                            <span class="fa fa-eye-slash"></span>
+                            <span>Unpublish</span>
+                        </button>
                     </div>
                 </td>
                 <td class="text-right">

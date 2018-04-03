@@ -17,6 +17,8 @@ public class QuestionDTO implements Serializable {
 
     private String feedback;
 
+    private boolean publish;
+
     private ZonedDateTime createDate;
 
     private Long eventId;
@@ -53,6 +55,14 @@ public class QuestionDTO implements Serializable {
 
     public void setFeedback(final String feedback) {
         this.feedback = feedback;
+    }
+
+    public boolean isPublish() {
+        return publish;
+    }
+
+    public void setPublish(final boolean publish) {
+        this.publish = publish;
     }
 
     public ZonedDateTime getCreateDate() {

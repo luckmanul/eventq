@@ -24,6 +24,10 @@
         {
             "fieldName": "createDate",
             "fieldType": "ZonedDateTime"
+        },
+        {
+            "fieldName": "publish",
+            "fieldType": "Boolean"
         }
     ],
     "changelogDate": "20180326175638",

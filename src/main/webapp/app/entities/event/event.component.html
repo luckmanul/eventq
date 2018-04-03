@@ -16,7 +16,7 @@
         <table class="table table-striped">
             <thead>
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
-            <th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>
+            <!--<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>-->
             <th jhiSortBy="code"><span jhiTranslate="eventqApp.event.code">Code</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="name"><span jhiTranslate="eventqApp.event.name">Name</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="type"><span jhiTranslate="eventqApp.event.type">Type</span> <span class="fa fa-sort"></span></th>
@@ -27,8 +27,9 @@
             </thead>
             <tbody>
             <tr *ngFor="let event of events ;trackBy: trackId">
-                <td><a [routerLink]="['../event', event.id ]">{{event.id}}</a></td>
-                <td>{{event.code}}</td>
+                <!--<td><a [routerLink]="['../event', event.id ]">{{event.id}}</a></td>-->
+                <!--<td>{{event.code}}</td>-->
+                <td><a [routerLink]="['../event', event.id ]">{{event.code}}</a></td>
                 <td>{{event.name}}</td>
                 <td>{{event.type}}</td>
                 <td>{{event.description}}</td>

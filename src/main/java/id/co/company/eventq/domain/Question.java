@@ -1,10 +1,16 @@
 package id.co.company.eventq.domain;
 
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * A Question.
@@ -31,6 +37,9 @@ public class Question implements Serializable {
     @Column(name = "create_date")
     private ZonedDateTime createDate;
 
+    @Column(name = "publish", nullable = false)
+    private Boolean publish = Boolean.FALSE;
+
     @ManyToOne
     private Event event;
 
@@ -38,7 +47,7 @@ public class Question implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -46,12 +55,12 @@ public class Question implements Serializable {
         return title;
     }
 
-    public Question title(String title) {
+    public Question title(final String title) {
         this.title = title;
         return this;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
@@ -59,12 +68,12 @@ public class Question implements Serializable {
         return description;
     }
 
-    public Question description(String description) {
+    public Question description(final String description) {
         this.description = description;
         return this;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -72,12 +81,12 @@ public class Question implements Serializable {
         return feedback;
     }
 
-    public Question feedback(String feedback) {
+    public Question feedback(final String feedback) {
         this.feedback = feedback;
         return this;
     }
 
-    public void setFeedback(String feedback) {
+    public void setFeedback(final String feedback) {
         this.feedback = feedback;
     }
 
@@ -85,56 +94,65 @@ public class Question implements Serializable {
         return createDate;
     }
 
-    public Question createDate(ZonedDateTime createDate) {
+    public Question createDate(final ZonedDateTime createDate) {
         this.createDate = createDate;
         return this;
     }
 
-    public void setCreateDate(ZonedDateTime createDate) {
+    public void setCreateDate(final ZonedDateTime createDate) {
         this.createDate = createDate;
+    }
+
+    public Boolean isPublish() {
+        return publish;
+    }
+
+    public Question publish(final Boolean publish) {
+        this.publish = publish;
+        return this;
+    }
+
+    public void setPublish(final Boolean publish) {
+        this.publish = publish;
     }
 
     public Event getEvent() {
         return event;
     }
 
-    public Question event(Event event) {
+    public Question event(final Event event) {
         this.event = event;
         return this;
     }
 
-    public void setEvent(Event event) {
+    public void setEvent(final Event event) {
         this.event = event;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        Question question = (Question) o;
-        if (question.getId() == null || getId() == null) {
+        final Question question = (Question) o;
+        if (question.getId() == null || this.getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), question.getId());
+        return Objects.equals(this.getId(), question.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId());
+        return Objects.hashCode(this.getId());
     }
 
     @Override
     public String toString() {
-        return "Question{" +
-            "id=" + getId() +
-            ", title='" + getTitle() + "'" +
-            ", description='" + getDescription() + "'" +
-            ", feedback='" + getFeedback() + "'" +
-            ", createDate='" + getCreateDate() + "'" +
-            "}";
+        return "Question{" + "id=" + this.getId() + ", title='" + this.getTitle() + "'" + ", description='"
+                + this.getDescription() + "'" + ", feedback='" + this.getFeedback() + "'" + ", createDate='"
+                + this.getCreateDate() + "'" + ", publish='" + this.isPublish() + "'" + "}";
     }
 }

@@ -5,6 +5,8 @@ import id.co.company.eventq.repository.EventRepository;
 import id.co.company.eventq.service.dto.EventDTO;
 import id.co.company.eventq.service.mapper.EventMapper;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -43,6 +45,9 @@ public class EventService {
         log.debug("Request to save Event : {}", eventDTO);
         Event event = eventMapper.toEntity(eventDTO);
         event = eventRepository.save(event);
+        if (event.getCreateDate() == null) {
+            event.setCreateDate(ZonedDateTime.now(ZoneId.systemDefault()));
+        }
         return eventMapper.toDto(event);
     }
 

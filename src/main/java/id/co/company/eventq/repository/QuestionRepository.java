@@ -10,8 +10,9 @@ import org.springframework.stereotype.Repository;
 /**
  * Spring Data JPA repository for the Question entity.
  */
-@SuppressWarnings("unused")
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     Page<Question> findByEventId(Long eventId, Pageable pageable);
+
+    Page<Question> findByEventIdAndPublishIsTrue(Long eventId, Pageable pageable);
 }
