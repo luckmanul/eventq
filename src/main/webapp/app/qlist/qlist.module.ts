@@ -12,7 +12,6 @@ import {
     questionRoute,
     questionPopupRoute,
 } from './';
-import {EventqWSService} from '../shared/eventqws/eventqws.service';
 
 const ENTITY_STATES = [
     ...questionRoute,
@@ -37,8 +36,7 @@ const ENTITY_STATES = [
     ],
     providers: [
         QuestionService,
-        QListPopupService,
-        EventqWSService
+        QListPopupService
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

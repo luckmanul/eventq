@@ -17,6 +17,8 @@ import {
     HasAnyAuthorityDirective,
     JhiLoginModalComponent
 } from './';
+import {QListWSService} from '../shared/eventqws/qlistws.service';
+import {QManageWSService} from '../shared/eventqws/qmanagews.service';
 
 @NgModule({
     imports: [
@@ -38,7 +40,9 @@ import {
         JhiTrackerService,
         AuthServerProvider,
         UserService,
-        DatePipe
+        DatePipe,
+        QListWSService,
+        QManageWSService
     ],
     entryComponents: [JhiLoginModalComponent],
     exports: [

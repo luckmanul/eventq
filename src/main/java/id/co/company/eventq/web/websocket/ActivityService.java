@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -58,15 +59,16 @@ public class ActivityService implements ApplicationListener<SessionDisconnectEve
         return activityDTO;
     }
 
-    @SubscribeMapping("/topic/eventq-activity")
-    @SendTo("/topic/eventq-subscriber")
+    @SubscribeMapping("/topic/qlist-activity/{eventCode}")
+    @SendTo("/topic/qlist-subscriber/{eventCode}")
     public Page<QuestionDTO> sendQActivity(@Payload final EventQActivity activity,
-            final StompHeaderAccessor stompHeaderAccessor, final Principal principal) {
+            @DestinationVariable final String eventCode, final StompHeaderAccessor stompHeaderAccessor,
+            final Principal principal) {
         activity.setUserLogin(principal.getName());
         activity.setSessionId(stompHeaderAccessor.getSessionId());
         activity.setIpAddress(stompHeaderAccessor.getSessionAttributes().get(IP_ADDRESS).toString());
 
-        log.debug("Receive message from ws {}", activity);
+        log.debug("Receive message from qlist {}", activity);
 
         Page<QuestionDTO> result = new PageImpl<>(new ArrayList<>());
         final EventDTO event = eventService.findByCode(activity.getEventCode());
@@ -74,7 +76,23 @@ public class ActivityService implements ApplicationListener<SessionDisconnectEve
             result = questionService.findByEvent(event.getId(),
                     new PageRequest(activity.getPage(), activity.getSize()));
         }
-        log.debug("Sending user tracking data {}", result);
+        log.debug("Sending question data {}", result);
+        return result;
+    }
+
+    @SubscribeMapping("/topic/qmanage-activity")
+    @SendTo("/topic/qmanage-subscriber")
+    public Page<QuestionDTO> sendQManageActivity(@Payload final EventQActivity activity,
+            final StompHeaderAccessor stompHeaderAccessor, final Principal principal) {
+        activity.setUserLogin(principal.getName());
+        activity.setSessionId(stompHeaderAccessor.getSessionId());
+        activity.setIpAddress(stompHeaderAccessor.getSessionAttributes().get(IP_ADDRESS).toString());
+
+        log.debug("Receive message from qmanage {}", activity);
+
+        Page<QuestionDTO> result = new PageImpl<>(new ArrayList<>());
+        result = questionService.findAll(new PageRequest(activity.getPage(), activity.getSize()));
+        log.debug("Sending question data {}", result);
         return result;
     }
 

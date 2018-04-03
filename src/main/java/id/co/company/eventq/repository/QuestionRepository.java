@@ -12,7 +12,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
+
     Page<Question> findByEventId(Long eventId, Pageable pageable);
+
+    Page<Question> findByPublish(boolean publish, Pageable pageable);
 
     Page<Question> findByEventIdAndPublishIsTrue(Long eventId, Pageable pageable);
 }

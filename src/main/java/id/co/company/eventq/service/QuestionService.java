@@ -64,6 +64,12 @@ public class QuestionService {
     }
 
     @Transactional(readOnly = true)
+    public Page<QuestionDTO> findByPublish(final boolean publish, final Pageable pageable) {
+        log.debug("Request to get all Publish Questions");
+        return questionRepository.findByPublish(publish, pageable).map(questionMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
     public Page<QuestionDTO> findByEvent(final Long eventId, final Pageable pageable) {
         log.debug("Request to get all Questions " + pageable);
         // return questionRepository.findByEventId(eventId, pageable).map(questionMapper::toDto);

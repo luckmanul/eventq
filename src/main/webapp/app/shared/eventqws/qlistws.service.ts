@@ -10,7 +10,7 @@ import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
 
 @Injectable()
-export class EventqWSService {
+export class QListWSService {
     stompClient = null;
     subscriber = null;
     connection: Promise<any>;
@@ -37,7 +37,7 @@ export class EventqWSService {
         // building absolute path so that websocket doesn't fail when deploying with a context path
         const loc = this.$window.nativeWindow.location;
         let url;
-        url = '//' + loc.host + loc.pathname + 'websocket/eventq';
+        url = '//' + loc.host + loc.pathname + 'websocket/qlist';
         const authToken = this.authServerProvider.getToken();
         if (authToken) {
             url += '?access_token=' + authToken;
@@ -76,10 +76,10 @@ export class EventqWSService {
         return this.listener;
     }
 
-    sendEventqActivity(eventCode: string, page: number, itemsPerPage: number) {
+    sendQListActivity(eventCode: string, page: number, itemsPerPage: number) {
         if (this.stompClient !== null && this.stompClient.connected) {
             this.stompClient.send(
-                '/topic/eventq-activity',
+                '/topic/qlist-activity/' + eventCode,
                 JSON.stringify( { 'eventCode' : eventCode, 'page': page, 'size': itemsPerPage } ), // body
                 {} // header
             );
@@ -89,16 +89,16 @@ export class EventqWSService {
     sendActivity() {
         if (this.stompClient !== null && this.stompClient.connected) {
             this.stompClient.send(
-                '/topic/eventq-activity', // destination
+                '/topic/qlist-activity', // destination
                 JSON.stringify({'page': this.router.routerState.snapshot.url}), // body
                 {} // header
             );
         }
     }
 
-    subscribe() {
+    subscribe(eventCode: string) {
         this.connection.then(() => {
-            this.subscriber = this.stompClient.subscribe('/topic/eventq-subscriber', (data) => {
+            this.subscriber = this.stompClient.subscribe('/topic/qlist-subscriber/' + eventCode, (data) => {
                 this.listenerObserver.next(JSON.parse(data.body));
             });
         });

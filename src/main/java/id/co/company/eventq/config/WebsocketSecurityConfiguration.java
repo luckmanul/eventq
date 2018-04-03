@@ -14,8 +14,10 @@ public class WebsocketSecurityConfiguration extends AbstractSecurityWebSocketMes
         messages
             // .nullDestMatcher().authenticated()
             .nullDestMatcher().permitAll()
-            .simpDestMatchers("/topic/eventq-subscriber").permitAll()
-            .simpSubscribeDestMatchers("/topic/eventq-activity").permitAll()
+            .simpDestMatchers("/topic/qlist-subscriber").permitAll()
+            .simpSubscribeDestMatchers("/topic/qlist-activity").permitAll()
+            .simpDestMatchers("/topic/qmanage-subscriber").permitAll()
+            .simpSubscribeDestMatchers("/topic/qmanage-activity").permitAll()
             .simpDestMatchers("/topic/tracker").hasAuthority(AuthoritiesConstants.ADMIN)
             // matches any destination that starts with /topic/
             // (i.e. cannot send messages directly to /topic/)

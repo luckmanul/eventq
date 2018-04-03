@@ -67,7 +67,7 @@ export class Principal {
             if (account) {
                 this.userIdentity = account;
                 this.authenticated = true;
-                //this.trackerService.connect();
+                // this.trackerService.connect();
             } else {
                 this.userIdentity = null;
                 this.authenticated = false;

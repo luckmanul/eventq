@@ -63,7 +63,20 @@ public class WebsocketConfiguration extends AbstractWebSocketMessageBrokerConfig
                 return principal;
             }
         }).setAllowedOrigins(allowedOrigins).withSockJS().setInterceptors(this.httpSessionHandshakeInterceptor());
-        registry.addEndpoint("/websocket/eventq").setHandshakeHandler(new DefaultHandshakeHandler() {
+        registry.addEndpoint("/websocket/qlist").setHandshakeHandler(new DefaultHandshakeHandler() {
+            @Override
+            protected Principal determineUser(final ServerHttpRequest request, final WebSocketHandler wsHandler,
+                    final Map<String, Object> attributes) {
+                Principal principal = request.getPrincipal();
+                if (principal == null) {
+                    final Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ANONYMOUS));
+                    principal = new AnonymousAuthenticationToken("WebsocketConfiguration", "anonymous", authorities);
+                }
+                return principal;
+            }
+        }).setAllowedOrigins(allowedOrigins).withSockJS().setInterceptors(this.httpSessionHandshakeInterceptor());
+        registry.addEndpoint("/websocket/qmanage").setHandshakeHandler(new DefaultHandshakeHandler() {
             @Override
             protected Principal determineUser(final ServerHttpRequest request, final WebSocketHandler wsHandler,
                     final Map<String, Object> attributes) {
