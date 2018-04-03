@@ -19,6 +19,7 @@
             "description": "Description",
             "feedback": "Feedback",
             "createDate": "Create Date",
+            "publish": "Publish",
             "event": "Event"
         }
     }

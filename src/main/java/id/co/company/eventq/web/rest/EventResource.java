@@ -131,12 +131,12 @@ public class EventResource {
     public ResponseEntity<EventDTO> getEventByCode(@PathVariable final String code) {
         log.debug("REST request to get Event : {}", code);
         final EventDTO eventDTO = eventService.findByCode(code);
-        try {
-            Thread.sleep(2000);
-        } catch (final InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        // try {
+        // Thread.sleep(2000);
+        // } catch (final InterruptedException e) {
+        // // TODO Auto-generated catch block
+        // e.printStackTrace();
+        // }
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(eventDTO));
     }
 

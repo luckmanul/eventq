@@ -38,3 +38,4 @@ target
 hs_err_pid*
 
 .yarn-error.log
+node

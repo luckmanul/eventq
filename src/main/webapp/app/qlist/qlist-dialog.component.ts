@@ -12,6 +12,7 @@ import { QListPopupService } from './qlist-popup.service';
 import { QuestionService } from './qlist.service';
 import { EventService } from '../entities/event/event.service';
 import { ResponseWrapper } from '../shared';
+import {DatePipe} from '@angular/common';
 
 @Component({
     selector: 'jhi-question-dialog',
@@ -31,7 +32,8 @@ export class QListDialogComponent implements OnInit {
         private alertService: AlertService,
         private questionService: QuestionService,
         private eventService: EventService,
-        private eventManager: EventManager
+        private eventManager: EventManager,
+        private datePipe: DatePipe
     ) {
     }
 
@@ -50,7 +52,8 @@ export class QListDialogComponent implements OnInit {
     save() {
         this.isSaving = true;
         this.question.eventId = this.event.id;
-        this.question.event = this.event;
+        // this.question.event = this.event;
+        // this.question.createDate = this.datePipe.transform(this.question.createDate, 'yyyy-MM-ddThh:mm');
         if (this.question.id !== undefined) {
             this.subscribeToSaveResponse(
                 this.questionService.update(this.question), false);

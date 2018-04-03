@@ -5,6 +5,9 @@ import id.co.company.eventq.repository.QuestionRepository;
 import id.co.company.eventq.service.dto.QuestionDTO;
 import id.co.company.eventq.service.mapper.QuestionMapper;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -41,6 +44,9 @@ public class QuestionService {
         log.debug("Request to save Question : {}", questionDTO);
         Question question = questionMapper.toEntity(questionDTO);
         question = questionRepository.save(question);
+        if (question.getCreateDate() == null) {
+            question.setCreateDate(ZonedDateTime.now(ZoneId.systemDefault()));
+        }
         return questionMapper.toDto(question);
     }
 
@@ -59,8 +65,9 @@ public class QuestionService {
 
     @Transactional(readOnly = true)
     public Page<QuestionDTO> findByEvent(final Long eventId, final Pageable pageable) {
-        log.debug("Request to get all Questions");
-        return questionRepository.findByEventId(eventId, pageable).map(questionMapper::toDto);
+        log.debug("Request to get all Questions " + pageable);
+        // return questionRepository.findByEventId(eventId, pageable).map(questionMapper::toDto);
+        return questionRepository.findByEventIdAndPublishIsTrue(eventId, pageable).map(questionMapper::toDto);
     }
 
     /**
