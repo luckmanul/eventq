@@ -17,5 +17,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     Page<Question> findByPublish(boolean publish, Pageable pageable);
 
-    Page<Question> findByEventIdAndPublishIsTrue(Long eventId, Pageable pageable);
+    Page<Question> findByEventIdAndPublishIsTrueOrderByLikesDesc(Long eventId, Pageable pageable);
 }

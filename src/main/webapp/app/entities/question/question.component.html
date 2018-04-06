@@ -19,6 +19,7 @@
             <!--<th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <span class="fa fa-sort"></span></th>-->
             <th jhiSortBy="title"><span jhiTranslate="eventqApp.question.title">Title</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="description"><span jhiTranslate="eventqApp.question.description">Description</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="likes"><span>Likes</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="feedback"><span jhiTranslate="eventqApp.question.feedback">Feedback</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="createDate"><span jhiTranslate="eventqApp.question.createDate">Create Date</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="publish"><span jhiTranslate="eventqApp.question.publish">Publish</span> <span class="fa fa-sort"></span></th>
@@ -33,6 +34,7 @@
                 <!--<td>{{question.title}}</td>-->
                 <td><a [routerLink]="['../question', question.id ]">{{question.title}}</a></td>
                 <td>{{question.description}}</td>
+                <td>{{question.likes}} likes</td>
                 <td>{{question.feedback}}</td>
                 <td>{{question.createDate | date:'medium'}}</td>
                 <!--<td>{{question.publish}}</td>-->

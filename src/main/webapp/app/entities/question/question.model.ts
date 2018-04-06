@@ -6,6 +6,7 @@ export class Question {
         public title?: string,
         public description?: string,
         public feedback?: string,
+        public likes?: number,
         public createDate?: any,
         public publish?: boolean,
         public eventId?: number,

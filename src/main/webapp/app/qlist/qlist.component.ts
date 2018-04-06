@@ -14,6 +14,7 @@ import {isNullOrUndefined} from 'util';
 import {QListWSService} from '../shared/eventqws/qlistws.service';
 import {QManageWSService} from '../shared/eventqws/qmanagews.service';
 import {Page} from './page.model';
+import {LocalStorageService} from 'ng2-webstorage/dist/app';
 
 @Component({
     selector: 'jhi-qlist',
@@ -37,6 +38,8 @@ export class QListComponent implements OnInit, OnDestroy {
     reverse: any;
     totalItems: number;
 
+    likes: Map<string, boolean> = new Map<string, boolean>();
+
     constructor(
         private questionService: QuestionService,
         private alertService: AlertService,
@@ -46,7 +49,8 @@ export class QListComponent implements OnInit, OnDestroy {
         private eventService: EventService,
         private datePipe: DatePipe,
         private qListWSService: QListWSService,
-        private qManageWSService: QManageWSService
+        private qManageWSService: QManageWSService,
+        private $localStorage: LocalStorageService
     ) {
         this.showQuestion = false;
         this.loading = false;
@@ -115,6 +119,7 @@ export class QListComponent implements OnInit, OnDestroy {
         this.page = page;
         this.loadAll();
     }
+
     ngOnInit() {
         if (!isNullOrUndefined(QListComponent.EVENTCODE)) {
             this.regEvent(QListComponent.EVENTCODE);
@@ -126,6 +131,8 @@ export class QListComponent implements OnInit, OnDestroy {
         //     this.currentAccount = account;
         // });
         this.registerChangeInQuestions();
+        const json: string = this.$localStorage.retrieve('likes');
+        this.likes = this.jsonToMap(json);
     }
 
     ngOnDestroy() {
@@ -149,6 +156,66 @@ export class QListComponent implements OnInit, OnDestroy {
         const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
         if (this.predicate !== 'id') {
             result.push('id');
+        }
+        return result;
+    }
+
+    public likeButtonEnabled(question: Question): boolean {
+        return this.likes.get(question.eventId + '_' + question.id);
+    }
+
+    public like(question: Question) {
+        this.likes.set(question.eventId + '_' + question.id, true);
+        this.$localStorage.clear('likes');
+        // this.$localStorage.store('likes', this.likes);
+        // this.$localStorage.store('likes', JSON.stringify(this.likes));
+        // let likesJson: string = this.mapToString(this.likes);
+        const likesJson: string = this.mapToJson(this.likes);
+        this.$localStorage.store('likes', likesJson);
+        this.questionService.like(question.id).subscribe((result: boolean) => {
+            console.log('Result like {}', result);
+            this.qListWSService.sendQListActivity(this.eventCode, this.page, 100000);
+            this.qManageWSService.sendQManageActivity(this.eventCode, this.page, 100000);
+        }, (err: any) => {
+            console.log('Result dislike {}', err);
+        });
+    }
+
+    public dislike(question: Question) {
+        this.likes.set(question.eventId + '_' + question.id, false);
+        this.$localStorage.clear('likes');
+        // this.$localStorage.store('likes', this.likes);
+        // let likesJson: string = this.mapToString(this.likes);
+        const likesJson: string = this.mapToJson(this.likes);
+        this.$localStorage.store('likes', likesJson);
+        this.questionService.dislike(question.id).subscribe((result: boolean) => {
+            console.log('Result dislike {}', result);
+            this.qListWSService.sendQListActivity(this.eventCode, this.page, 100000);
+            this.qManageWSService.sendQManageActivity(this.eventCode, this.page, 100000);
+        }, (err: any) => {
+            console.log('Result dislike {}', err);
+        });
+    }
+
+    mapToJson(map): string {
+            const result: string = JSON.stringify(
+                Array.from(map.entries()).reduce((o, [key, value]) => {
+                        o[key] = value;
+                        return o;
+                    }, {})
+            );
+            return result;
+    }
+
+    jsonToMap(jsonStr): Map<string, boolean> {
+        const obj = JSON.parse(jsonStr);
+        return this.objToMap(obj);
+    }
+
+    objToMap(obj) {
+        const result = new Map();
+        for (const key of Object.keys(obj)) {
+            result.set(key, obj[key]);
         }
         return result;
     }

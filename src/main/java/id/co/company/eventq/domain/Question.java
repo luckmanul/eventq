@@ -34,6 +34,9 @@ public class Question implements Serializable {
     @Column(name = "feedback")
     private String feedback;
 
+    @Column(name = "likes")
+    private long likes;
+
     @Column(name = "create_date")
     private ZonedDateTime createDate;
 
@@ -88,6 +91,18 @@ public class Question implements Serializable {
 
     public void setFeedback(final String feedback) {
         this.feedback = feedback;
+    }
+
+    public long getLikes() {
+        return likes;
+    }
+
+    public void setLikes(final long likes) {
+        this.likes = likes;
+    }
+
+    public Boolean getPublish() {
+        return publish;
     }
 
     public ZonedDateTime getCreateDate() {

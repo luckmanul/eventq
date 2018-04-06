@@ -73,7 +73,8 @@ public class QuestionService {
     public Page<QuestionDTO> findByEvent(final Long eventId, final Pageable pageable) {
         log.debug("Request to get all Questions " + pageable);
         // return questionRepository.findByEventId(eventId, pageable).map(questionMapper::toDto);
-        return questionRepository.findByEventIdAndPublishIsTrue(eventId, pageable).map(questionMapper::toDto);
+        return questionRepository.findByEventIdAndPublishIsTrueOrderByLikesDesc(eventId, pageable)
+                .map(questionMapper::toDto);
     }
 
     /**
@@ -99,5 +100,30 @@ public class QuestionService {
     public void delete(final Long id) {
         log.debug("Request to delete Question : {}", id);
         questionRepository.delete(id);
+    }
+
+    public boolean like(final Long id) {
+        return this.updateLikes(id, 1);
+    }
+
+    public boolean dislike(final Long id) {
+        return this.updateLikes(id, -1);
+    }
+
+    public boolean updateLikes(final long id, final long count) {
+        try {
+            final Question question = questionRepository.findOne(id);
+            if (question != null) {
+                long likes = question.getLikes();
+                likes = likes + count;
+                likes = likes < 0 ? 0 : likes;
+                question.setLikes(likes);
+                questionRepository.save(question);
+                return true;
+            }
+        } catch (final Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return false;
     }
 }

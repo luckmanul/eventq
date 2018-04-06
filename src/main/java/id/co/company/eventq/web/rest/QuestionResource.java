@@ -137,6 +137,20 @@ public class QuestionResource {
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(questionDTO));
     }
 
+    @PostMapping("/questions/like/{id}")
+    @Timed
+    public ResponseEntity<Boolean> like(@PathVariable final long id) {
+        final boolean result = questionService.like(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping("/questions/dislike/{id}")
+    @Timed
+    public ResponseEntity<Boolean> dislike(@PathVariable final long id) {
+        final boolean result = questionService.dislike(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     /**
      * DELETE /questions/:id : delete the "id" question.
      *

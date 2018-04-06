@@ -22,6 +22,22 @@ export class QuestionService {
         });
     }
 
+    like(id: number): Observable<boolean> {
+        return this.http.post(this.resourceUrl + '/like/' + id, '').map((res: Response) => {
+            const resStr = res.json();
+            const result: boolean = Boolean(resStr).valueOf();
+            return result;
+        });
+    }
+
+    dislike(id: number): Observable<boolean> {
+        return this.http.post(this.resourceUrl + '/dislike/' + id, '').map((res: Response) => {
+            const resStr = res.json();
+            const result: boolean = Boolean(resStr).valueOf();
+            return result;
+        });
+    }
+
     update(question: Question): Observable<Question> {
         const copy = this.convert(question);
         return this.http.put(this.resourceUrl, copy).map((res: Response) => {

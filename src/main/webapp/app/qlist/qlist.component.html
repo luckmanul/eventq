@@ -43,6 +43,7 @@
                     <th jhiSortBy="title"><span jhiTranslate="eventqApp.question.title">Title</span> <span class="fa fa-sort"></span></th>
                     <th jhiSortBy="description"><span jhiTranslate="eventqApp.question.description">Description</span> <span class="fa fa-sort"></span></th>
                     <!--<th jhiSortBy="feedback"><span jhiTranslate="eventqApp.question.feedback">Feedback</span> <span class="fa fa-sort"></span></th>-->
+                    <th jhiSortBy="likes"><span>Likes</span> <span class="fa fa-sort"></span></th>
                     <th jhiSortBy="createDate"><span jhiTranslate="eventqApp.question.createDate">Create Date</span> <span class="fa fa-sort"></span></th>
                     <!--<th jhiSortBy="eventId"><span jhiTranslate="eventqApp.question.event">Event</span> <span class="fa fa-sort"></span></th>-->
                     <th jhiSortBy="event.name"><span jhiTranslate="eventqApp.question.event">Event</span> <span class="fa fa-sort"></span></th>
@@ -55,6 +56,7 @@
                     <!--<td><a [routerLink]="['../qlist', question.id ]">{{question.id}}</a></td>-->
                     <td>{{question.title}}</td>
                     <td>{{question.description}}</td>
+                    <td>{{question.likes}} likes</td>
                     <!--<td>{{question.feedback}}</td>-->
                     <td>{{question.createDate | date:'medium'}}</td>
                     <td>
@@ -62,6 +64,7 @@
                             {{question.event.name}}
                         </div>
                     </td>
+                    <td>{{question.feedback}}</td>
                     <!--<td>-->
                         <!--<div *ngIf="question.eventId">-->
                             <!--<a [routerLink]="['../event', question.eventId  ]" >{{question.eventId}}</a>-->
@@ -69,6 +72,14 @@
                     <!--</td>-->
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
+                            <button type="submit" class="btn btn-secondary btn-sm" (click)="like(question)" *ngIf="!likeButtonEnabled(question)">
+                                <span class="fa fa-thumbs-up"></span>
+                                <span class="hidden-md-down"></span>
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-sm" (click)="dislike(question)" *ngIf="likeButtonEnabled(question)">
+                                <span class="fa fa-thumbs-up" ></span>
+                                <span class="hidden-md-down"></span>
+                            </button>
                             <button type="submit"
                                     [routerLink]="['../qlist', question.id ]"
                                     class="btn btn-info btn-sm">
