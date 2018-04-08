@@ -19,6 +19,7 @@ export class QListWSService {
     listenerObserver: Observer<any>;
     alreadyConnectedOnce = false;
     private subscription: Subscription;
+    self: any;
 
     constructor(
         private router: Router,
@@ -28,12 +29,13 @@ export class QListWSService {
     ) {
         this.connection = this.createConnection();
         this.listener = this.createListener();
+        this.self = this;
     }
 
-    connect() {
-        if (this.connectedPromise === null) {
-          this.connection = this.createConnection();
-        }
+    connect(connectCallback) {
+        // if (this.connectedPromise === null) {
+        //   this.connection = this.createConnection();
+        // }
         // building absolute path so that websocket doesn't fail when deploying with a context path
         const loc = this.$window.nativeWindow.location;
         let url;
@@ -42,22 +44,53 @@ export class QListWSService {
         if (authToken) {
             url += '?access_token=' + authToken;
         }
+        this.connectAndReconnect(url, this.onConnected, connectCallback);
+        // const socket = new SockJS(url);
+        // this.stompClient = Stomp.over(socket);
+        // const headers = {};
+        // this.stompClient.connect(headers, () => {
+        //     this.connectedPromise('success');
+        //     this.connectedPromise = null;
+        //     // this.sendActivity();
+        //     if (!this.alreadyConnectedOnce) {
+        //         this.subscription = this.router.events.subscribe((event) => {
+        //           if (event instanceof NavigationEnd) {
+        //             // this.sendActivity();
+        //           }
+        //         });
+        //         this.alreadyConnectedOnce = true;
+        //     }
+        // });
+    }
+
+    private connectAndReconnect(url, successCallback, connectCallback) {
         const socket = new SockJS(url);
         this.stompClient = Stomp.over(socket);
-        const headers = {};
-        this.stompClient.connect(headers, () => {
-            this.connectedPromise('success');
-            this.connectedPromise = null;
-            // this.sendActivity();
-            if (!this.alreadyConnectedOnce) {
-                this.subscription = this.router.events.subscribe((event) => {
-                  if (event instanceof NavigationEnd) {
-                    // this.sendActivity();
-                  }
-                });
-                this.alreadyConnectedOnce = true;
-            }
+        this.stompClient .connect({}, (frame) => {
+            successCallback(this, connectCallback);
+        }, () => {
+            setTimeout(() => {
+                this.connectAndReconnect(url, successCallback, connectCallback);
+            }, 30000);
         });
+    }
+
+    private onConnected(parent: QListWSService, connectCallback) {
+        if (parent.connectedPromise === null) {
+            parent.connection = parent.createConnection();
+        }
+        parent.connectedPromise('success');
+        parent.connectedPromise = null;
+        // this.sendActivity();
+        connectCallback();
+        if (!parent.alreadyConnectedOnce) {
+            parent.subscription = parent.router.events.subscribe((event) => {
+                if (event instanceof NavigationEnd) {
+                    // this.sendActivity();
+                }
+            });
+            parent.alreadyConnectedOnce = true;
+        }
     }
 
     disconnect() {

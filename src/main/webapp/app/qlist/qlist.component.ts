@@ -124,8 +124,15 @@ export class QListComponent implements OnInit, OnDestroy {
         if (!isNullOrUndefined(QListComponent.EVENTCODE)) {
             this.regEvent(QListComponent.EVENTCODE);
         }
-        this.qListWSService.connect();
-        this.qManageWSService.connect();
+        const parent = this;
+        this.qListWSService.connect(function() {
+            if (!isNullOrUndefined(QListComponent.EVENTCODE)) {
+                parent.regEvent(QListComponent.EVENTCODE);
+            }
+        });
+        this.qManageWSService.connect(function() {
+            // do nothing
+        });
         // this.loadAll();
         // this.principal.identity().then((account) => {
         //     this.currentAccount = account;

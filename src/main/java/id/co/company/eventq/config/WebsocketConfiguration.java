@@ -16,6 +16,8 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.socket.WebSocketHandler;
@@ -31,6 +33,10 @@ import io.github.jhipster.config.JHipsterProperties;
 @EnableWebSocketMessageBroker
 public class WebsocketConfiguration extends AbstractWebSocketMessageBrokerConfigurer {
 
+    private static long SERVER_HEARTBEAT = 25000L;
+    private static long CLIENT_HEARTBEAT = 20000L;
+    private static int POOL_SIZE = 10;
+
     private final Logger log = LoggerFactory.getLogger(WebsocketConfiguration.class);
 
     public static final String IP_ADDRESS = "IP_ADDRESS";
@@ -43,7 +49,17 @@ public class WebsocketConfiguration extends AbstractWebSocketMessageBrokerConfig
 
     @Override
     public void configureMessageBroker(final MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
+        config.enableSimpleBroker("/topic").setHeartbeatValue(new long[] { SERVER_HEARTBEAT, CLIENT_HEARTBEAT })
+                .setTaskScheduler(this.heartBeatScheduler());
+    }
+
+    @Bean
+    public TaskScheduler heartBeatScheduler() {
+        final ThreadPoolTaskScheduler result = new ThreadPoolTaskScheduler();
+        result.setPoolSize(POOL_SIZE);
+        result.setThreadNamePrefix("ws-heartbeat-");
+        result.setThreadGroupName("ws-heartbeat");
+        return result;
     }
 
     @Override

@@ -75,8 +75,13 @@ export class QuestionComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         this.registerChangeInQuestions();
-        this.qListWSService.connect();
-        this.qManageWSService.connect();
+        const parent = this;
+        this.qListWSService.connect(function() {
+            // noop
+        });
+        this.qManageWSService.connect(function() {
+            parent.subscribeWebSocket();
+        });
         this.loadAll();
         this.subscribeWebSocket();
     }
