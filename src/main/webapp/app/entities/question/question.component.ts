@@ -6,11 +6,13 @@ import { EventManager, ParseLinks, PaginationUtil, JhiLanguageService, AlertServ
 import { Question } from './question.model';
 import { QuestionService } from './question.service';
 import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
-import { PaginationConfig } from '../../blocks/config/uib-pagination.config';
+// import { PaginationConfig } from '../../blocks/config/uib-pagination.config';
 import {DatePipe} from '@angular/common';
-import {QListWSService} from '../../shared/eventqws/qlistws.service';
-import {QManageWSService} from '../../shared/eventqws/qmanagews.service';
+// import {QListWSService} from '../../shared/eventqws/qlistws.service';
+// import {QManageWSService} from '../../shared/eventqws/qmanagews.service';
 import {Page} from '../../qlist/page.model';
+import {WebsocketService} from '../../shared/websocket/websocket.service';
+import {isNullOrUndefined} from 'util';
 
 @Component({
     selector: 'jhi-question',
@@ -21,6 +23,7 @@ export class QuestionComponent implements OnInit, OnDestroy {
     questions: Question[];
     currentAccount: any;
     eventSubscriber: Subscription;
+    websocketConnectionSubscriber: Subscription;
     itemsPerPage: number;
     links: any;
     page: any;
@@ -36,8 +39,7 @@ export class QuestionComponent implements OnInit, OnDestroy {
         private parseLinks: ParseLinks,
         private principal: Principal,
         private datePipe: DatePipe,
-        private qListWSService: QListWSService,
-        private qManageWSService: QManageWSService
+        private websocketService: WebsocketService
     ) {
         this.questions = [];
         this.itemsPerPage = ITEMS_PER_PAGE;
@@ -75,19 +77,13 @@ export class QuestionComponent implements OnInit, OnDestroy {
             this.currentAccount = account;
         });
         this.registerChangeInQuestions();
-        const parent = this;
-        this.qListWSService.connect(function() {
-            // noop
-        });
-        this.qManageWSService.connect(function() {
-            parent.subscribeWebSocket();
-        });
         this.loadAll();
         this.subscribeWebSocket();
     }
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
+        this.eventManager.destroy(this.websocketConnectionSubscriber);
     }
 
     trackId(index: number, item: Question) {
@@ -96,14 +92,42 @@ export class QuestionComponent implements OnInit, OnDestroy {
 
     registerChangeInQuestions() {
         this.eventSubscriber = this.eventManager.subscribe('questionListModification', (response) => {
-            // this.qListWSService.sendQListActivity(question.event.code, 0, 1000000);
+            console.log('Question Change event : {}', response);
+            if (!isNullOrUndefined(response) && !isNullOrUndefined(response.item)) {
+                const question: Question = response.item;
+                this.websocketService.sendQListActivity(question.event.code, 0, 1000000);
+            }
             this.reset();
+        });
+        this.websocketConnectionSubscriber = this.eventManager.subscribe('websocketConnection', (response) => {
+            console.log('websocket connection response {}', response);
+            if (!isNullOrUndefined(response)) {
+                if ('CONNECTED' === response.content) {
+                    this.subscribeWebSocket();
+                    // this.alertService.addAlert({
+                    //     type: 'info',
+                    //     msg: 'websocket.connected',
+                    //     params: {},
+                    //     timeout: 10000,
+                    //     toast: true
+                    // }, []);
+                } else {
+                    this.unsubscribeWebSocket();
+                    // this.alertService.addAlert({
+                    //     type: 'info',
+                    //     msg: 'websocket.disconnected',
+                    //     params: {},
+                    //     timeout: 10000,
+                    //     toast: true
+                    // }, []);
+                }
+            }
         });
     }
 
     subscribeWebSocket() {
-        this.qManageWSService.subscribe();
-        this.qManageWSService.receive().subscribe(
+        this.websocketService.subscribeManage();
+        this.websocketService.receiveManage().subscribe(
             (pageQuestion: Page<Question>) => {
                 console.log('message {}', pageQuestion);
                 this.page = 0;
@@ -116,6 +140,11 @@ export class QuestionComponent implements OnInit, OnDestroy {
                 }
             }
         );
+    }
+
+    unsubscribeWebSocket() {
+        this.websocketService.unsubscribeManage();
+        // this.websocketService.unsubscribePublic();
     }
 
     sort() {
@@ -142,7 +171,7 @@ export class QuestionComponent implements OnInit, OnDestroy {
         this.questionService.update(question).subscribe(
             (res: Question) => {
                 this.reset();
-                this.qListWSService.sendQListActivity(question.event.code, 0, 1000000);
+                this.websocketService.sendQListActivity(question.event.code, 0, 1000000);
             }, (res: Response) => {
                 this.onError({ message: 'Update failed'});
             });

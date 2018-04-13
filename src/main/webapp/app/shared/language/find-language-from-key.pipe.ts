@@ -17,6 +17,7 @@ export class FindLanguageFromKeyPipe implements PipeTransform {
         'hi': 'हिंदी',
         'hy': 'Հայերեն',
         'it': 'Italiano',
+        'id': 'Bahasa',
         'ja': '日本語',
         'ko': '한국어',
         'mr': 'मराठी',

@@ -32,7 +32,8 @@ export class QuestionDeleteDialogComponent {
         this.questionService.delete(id).subscribe((response) => {
             this.eventManager.broadcast({
                 name: 'questionListModification',
-                content: 'Deleted an question'
+                content: 'Deleted an question',
+                item: this.question
             });
             this.activeModal.dismiss(true);
         });

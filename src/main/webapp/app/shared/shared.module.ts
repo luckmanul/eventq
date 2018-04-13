@@ -19,6 +19,8 @@ import {
 } from './';
 import {QListWSService} from '../shared/eventqws/qlistws.service';
 import {QManageWSService} from '../shared/eventqws/qmanagews.service';
+import {WebsocketService} from './websocket/websocket.service';
+import {AutofocusDirective} from './autofocus/autofocus.directive';
 
 @NgModule({
     imports: [
@@ -27,7 +29,8 @@ import {QManageWSService} from '../shared/eventqws/qmanagews.service';
     ],
     declarations: [
         JhiLoginModalComponent,
-        HasAnyAuthorityDirective
+        HasAnyAuthorityDirective,
+        AutofocusDirective
     ],
     providers: [
         CookieService,
@@ -42,13 +45,15 @@ import {QManageWSService} from '../shared/eventqws/qmanagews.service';
         UserService,
         DatePipe,
         QListWSService,
-        QManageWSService
+        QManageWSService,
+        WebsocketService
     ],
     entryComponents: [JhiLoginModalComponent],
     exports: [
         EventqSharedCommonModule,
         JhiLoginModalComponent,
         HasAnyAuthorityDirective,
+        AutofocusDirective,
         DatePipe
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

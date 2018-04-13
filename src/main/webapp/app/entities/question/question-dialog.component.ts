@@ -66,7 +66,11 @@ export class QuestionDialogComponent implements OnInit {
             : 'eventqApp.question.updated',
             { param : result.id }, null);
 
-        this.eventManager.broadcast({ name: 'questionListModification', content: 'OK'});
+        this.eventManager.broadcast({
+            name: 'questionListModification',
+            content: 'OK',
+            item: result
+        });
         this.isSaving = false;
         this.activeModal.dismiss(result);
     }

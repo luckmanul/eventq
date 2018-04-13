@@ -11,10 +11,11 @@ import { PaginationConfig } from '../blocks/config/uib-pagination.config';
 import {EventService} from '../entities/event/event.service';
 import {DatePipe} from '@angular/common';
 import {isNullOrUndefined} from 'util';
-import {QListWSService} from '../shared/eventqws/qlistws.service';
-import {QManageWSService} from '../shared/eventqws/qmanagews.service';
+// import {QListWSService} from '../shared/eventqws/qlistws.service';
+// import {QManageWSService} from '../shared/eventqws/qmanagews.service';
 import {Page} from './page.model';
 import {LocalStorageService} from 'ng2-webstorage/dist/app';
+import {WebsocketService} from '../shared/websocket/websocket.service';
 
 @Component({
     selector: 'jhi-qlist',
@@ -30,6 +31,7 @@ export class QListComponent implements OnInit, OnDestroy {
     questions: Question[];
     currentAccount: any;
     eventSubscriber: Subscription;
+    websocketConnectionSubscriber: Subscription;
     itemsPerPage: number;
     links: any;
     page: any;
@@ -48,8 +50,7 @@ export class QListComponent implements OnInit, OnDestroy {
         private principal: Principal,
         private eventService: EventService,
         private datePipe: DatePipe,
-        private qListWSService: QListWSService,
-        private qManageWSService: QManageWSService,
+        private websocketService: WebsocketService,
         private $localStorage: LocalStorageService
     ) {
         this.showQuestion = false;
@@ -92,8 +93,8 @@ export class QListComponent implements OnInit, OnDestroy {
     }
 
     subscribeWebSocket(eventCode: string) {
-        this.qListWSService.subscribe(eventCode);
-        this.qListWSService.receive().subscribe(
+        this.websocketService.subscribePublic(eventCode);
+        this.websocketService.receivePublic().subscribe(
             (pageQuestion: Page<Question>) => {
                 console.log('message {}', pageQuestion);
                 this.page = 0;
@@ -107,6 +108,11 @@ export class QListComponent implements OnInit, OnDestroy {
                 this.showQuestion = true;
             }
         );
+    }
+
+    unsubscribeWebSocket() {
+        // this.websocketService.unsubscribeManage();
+        this.websocketService.unsubscribePublic();
     }
 
     reset() {
@@ -125,18 +131,6 @@ export class QListComponent implements OnInit, OnDestroy {
             this.regEvent(QListComponent.EVENTCODE);
         }
         const parent = this;
-        this.qListWSService.connect(function() {
-            if (!isNullOrUndefined(QListComponent.EVENTCODE)) {
-                parent.regEvent(QListComponent.EVENTCODE);
-            }
-        });
-        this.qManageWSService.connect(function() {
-            // do nothing
-        });
-        // this.loadAll();
-        // this.principal.identity().then((account) => {
-        //     this.currentAccount = account;
-        // });
         this.registerChangeInQuestions();
         const json: string = this.$localStorage.retrieve('likes');
         this.likes = this.jsonToMap(json);
@@ -144,7 +138,8 @@ export class QListComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
-        this.qListWSService.unsubscribe();
+        this.eventManager.destroy(this.websocketConnectionSubscriber);
+        this.unsubscribeWebSocket();
     }
 
     trackId(index: number, item: Question) {
@@ -153,9 +148,35 @@ export class QListComponent implements OnInit, OnDestroy {
 
     registerChangeInQuestions() {
         this.eventSubscriber = this.eventManager.subscribe('questionListModification', (response) => {
-            this.qListWSService.sendQListActivity(this.eventCode, this.page, this.itemsPerPage);
-            this.qManageWSService.sendQManageActivity(this.eventCode, this.page, this.itemsPerPage);
-            // this.reset()
+            this.websocketService.sendQListActivity(this.eventCode, this.page, this.itemsPerPage);
+            this.websocketService.sendQManageActivity(this.eventCode, this.page, this.itemsPerPage);
+        });
+        this.websocketConnectionSubscriber = this.eventManager.subscribe('websocketConnection', (response) => {
+            console.log('websocket connection response {}', response);
+            if (!isNullOrUndefined(response)) {
+                if ('CONNECTED' === response.content) {
+                    // this.alertService.addAlert({
+                    //     type: 'info',
+                    //     msg: 'websocket.connected',
+                    //     params: {},
+                    //     timeout: 10000,
+                    //     toast: true
+                    // }, []);
+                    if (!isNullOrUndefined(QListComponent.EVENTCODE)) {
+                        this.regEvent(QListComponent.EVENTCODE);
+                        this.subscribeWebSocket(QListComponent.EVENTCODE);
+                    }
+                } else {
+                    // this.alertService.addAlert({
+                    //     type: 'info',
+                    //     msg: 'websocket.disconnected',
+                    //     params: {},
+                    //     timeout: 10000,
+                    //     toast: true
+                    // }, []);
+                    this.unsubscribeWebSocket();
+                }
+            }
         });
     }
 
@@ -181,8 +202,8 @@ export class QListComponent implements OnInit, OnDestroy {
         this.$localStorage.store('likes', likesJson);
         this.questionService.like(question.id).subscribe((result: boolean) => {
             console.log('Result like {}', result);
-            this.qListWSService.sendQListActivity(this.eventCode, this.page, 100000);
-            this.qManageWSService.sendQManageActivity(this.eventCode, this.page, 100000);
+            this.websocketService.sendQListActivity(this.eventCode, this.page, 100000);
+            this.websocketService.sendQManageActivity(this.eventCode, this.page, 100000);
         }, (err: any) => {
             console.log('Result dislike {}', err);
         });
@@ -197,8 +218,8 @@ export class QListComponent implements OnInit, OnDestroy {
         this.$localStorage.store('likes', likesJson);
         this.questionService.dislike(question.id).subscribe((result: boolean) => {
             console.log('Result dislike {}', result);
-            this.qListWSService.sendQListActivity(this.eventCode, this.page, 100000);
-            this.qManageWSService.sendQManageActivity(this.eventCode, this.page, 100000);
+            this.websocketService.sendQListActivity(this.eventCode, this.page, 100000);
+            this.websocketService.sendQManageActivity(this.eventCode, this.page, 100000);
         }, (err: any) => {
             console.log('Result dislike {}', err);
         });
